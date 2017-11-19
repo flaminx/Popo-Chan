@@ -38,8 +38,8 @@ namespace Popochan
                 try
                 {
                     // Create a new set of credentials for the application.
-                    var appCredentials = new TwitterCredentials("I5oWeEgp56hy7zUHJVK3uaMQE",
-                        "2Ak80veLdmVBRwoobdtwSCL8HPyhVWGyBjMltL7TUdPkAhcw1P");
+                    var appCredentials = new TwitterCredentials("yourkey",
+                        "yoursecret");
 
                     // Init the authentication process and store the related `AuthenticationContext`.
                     var authenticationContext = AuthFlow.InitAuthentication(appCredentials);
@@ -72,8 +72,8 @@ namespace Popochan
             else
                 try
                 {
-                    Auth.SetUserCredentials("I5oWeEgp56hy7zUHJVK3uaMQE",
-                        "2Ak80veLdmVBRwoobdtwSCL8HPyhVWGyBjMltL7TUdPkAhcw1P",
+                    Auth.SetUserCredentials("yourkey",
+                        "yoursecret",
                         ConfigurationManager.AppSettings["AccessToken"],
                         ConfigurationManager.AppSettings["AccessTokenSecret"]);
                 }
