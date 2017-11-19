@@ -1,44 +1,40 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
-using System.Runtime.Remoting.Channels;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
-using Tweetinvi;
-using Tweetinvi.Models;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
+using Tweetinvi;
+using Tweetinvi.Models;
 using Tweetinvi.Streaming;
 
 namespace Popochan
 {
-    static class manageScanner
+    internal static class manageScanner
     {
         public static bool isRunning { get; set; }
         public static IFilteredStream stream { get; set; }
     }
 
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
-            => new Program().MainAsync().GetAwaiter().GetResult();
+        private DiscordSocketClient _client;
 
         //private List<String> stList;
         private CommandService _commands;
-        private DiscordSocketClient _client;
         private IServiceProvider _services;
+
+        private static void Main(string[] args)
+            => new Program().MainAsync().GetAwaiter().GetResult();
 
         public async Task MainAsync()
         {
             manageScanner.isRunning = false;
             if (ConfigurationManager.AppSettings["AccessToken"] == "")
-            {
                 try
                 {
                     // Create a new set of credentials for the application.
@@ -73,9 +69,7 @@ namespace Popochan
                         Environment.Exit(0);
                     }
                 }
-            }
             else
-            {
                 try
                 {
                     Auth.SetUserCredentials("I5oWeEgp56hy7zUHJVK3uaMQE",
@@ -89,10 +83,9 @@ namespace Popochan
                     Console.ReadKey();
                     Environment.Exit(0);
                 }
-            }
             _client = new DiscordSocketClient();
             _commands = new CommandService();
-            string token = ConfigurationManager.AppSettings["DiscordToken"];
+            var token = ConfigurationManager.AppSettings["DiscordToken"];
 
             _services = new ServiceCollection()
                 .AddSingleton(_client)
@@ -109,9 +102,7 @@ namespace Popochan
             //Console.WriteLine("Tweet stream has started, press Enter to cancel");
             Console.ReadLine();
             if (manageScanner.stream != null)
-            {
                 if (manageScanner.stream.StreamState == StreamState.Running) manageScanner.stream.StopStream();
-            }
             Console.WriteLine("Shutdown");
             //stream.StopStream();
         }
@@ -130,7 +121,7 @@ namespace Popochan
             var message = messageParam as SocketUserMessage;
             if (message == null) return;
             // Create a number to track where the prefix ends and the command begins
-            int argPos = 0;
+            var argPos = 0;
             // Determine if the message is a command, based on if it starts with '!' or a mention prefix
             if (!(message.HasCharPrefix('!', ref argPos) || message.HasMentionPrefix(_client.CurrentUser, ref argPos)))
                 return;
@@ -167,24 +158,23 @@ namespace Popochan
                         if (!args.Tweet.IsRetweet)
                         {
                             //Not really understanding what this does
-                            String result = args.Tweet.FullText;
+                            var result = args.Tweet.FullText;
                             try
                             {
                                 Console.WriteLine(result);
                             }
                             catch (Exception)
                             {
-                                Console.WriteLine("Oh crumbs the tweet couldn't be output to console, thats really weird :s");
+                                Console.WriteLine(
+                                    "Oh crumbs the tweet couldn't be output to console, thats really weird :s");
                             }
-                            String url = "";
-                            int m = result.IndexOf("htt");
+                            var url = "";
+                            var m = result.IndexOf("htt");
                             if (m != -1)
                             {
-                                for (int i = m; i <= result.Length - 1 && result[i] != ' '; i++)
-                                {
+                                for (var i = m; (i <= result.Length - 1) && (result[i] != ' '); i++)
                                     url += result[i];
-                                }
-                                String creator = args.Tweet.CreatedBy.Name + "";
+                                var creator = args.Tweet.CreatedBy.Name + "";
                                 Context.Channel.SendMessageAsync(
                                     ":police_car: Bad guy alert ~~ Get em Oni-chaaaan! :police_car: " + url
                                     + " Arigato " + creator + " :heart:");
@@ -231,7 +221,7 @@ namespace Popochan
         [Summary("Praise the bot")]
         public async Task goodBotAsync()
         {
-            int botPointsInt = Int32.Parse(ConfigurationManager.AppSettings["botPoints"]);
+            var botPointsInt = int.Parse(ConfigurationManager.AppSettings["botPoints"]);
             botPointsInt++;
             ConfigurationManager.AppSettings["botPoints"] = botPointsInt.ToString();
 
@@ -242,7 +232,7 @@ namespace Popochan
         [Summary("Scold the bot :(")]
         public async Task badBotAsync()
         {
-            int botPointsInt = Int32.Parse(ConfigurationManager.AppSettings["botPoints"]);
+            var botPointsInt = int.Parse(ConfigurationManager.AppSettings["botPoints"]);
             botPointsInt--;
             ConfigurationManager.AppSettings["botPoints"] = botPointsInt.ToString();
             await Context.Channel.SendMessageAsync("But...why? ;_; Cookies: " + botPointsInt);
